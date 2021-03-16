@@ -46,43 +46,50 @@ def cleanText(text):
     
     #Remove all english stop words
     stop_words = set(stopwords.words("english"))
-
     #text = re.sub(stop_words, "", text)
     #text = re.sub(stopwords, "", text)
+    
     #Check if each word in the text and add the ones not in stop words
-    return text
     #Join all the text by " "
     
     #Return the clean text
-    
-newdf0["consumer_complaint_narrative"] = newdf0["consumer_complaint_narrative"].apply(cleanText)
+    return text
+
 #Apply clean text to the complaints
+newdf0["consumer_complaint_narrative"] = newdf0["consumer_complaint_narrative"].apply(cleanText)
+
+
+
+#Define maximum number of words in our vocabulary to 50000
+maxWords = 50000
+#Define maximum number of words within each complaint document to 250
+maxCom = 250
+#Define maximum number of words within each embedding to 100
+maxEmbed = 100
+#Implement Tokenizer object with num_words, filters, lower, split, and char_level
+tf = Tokenizer(num_words = maxWords,
+               filters = '[,.\"!@#$%^&*(){}?/;`~:<>+=-]',
+               lower = True,
+               split = ' ',
+               char_level = True)
+
+#Fit Tokenizer object on the text
+newdf0["consumer_complaint_narrative"] = newdf0["consumer_complaint_narrative"].apply(tf.fit_on_texts)
+
+#Get the word index from tokenizer object
+words = tf.word_index
+#Print number of unique tokens found
+print("Number of unique tokens: ", len(set(words)))
+#Get a text to sequences representation of the complaints
+sequences = tf.texts_to_sequences(newdf0)
+#Pad the sequences with the max length
+data = pad_sequences(sequences, maxlen = maxCom, padding = 'post')
+#Print the shape of the data
+print(data.shape)
+#Print the first example of the tokenizer object to the sequences to text
+
 def main():
     print(newdf0)
 
 if __name__ == "__main__":
     main()
-
-#Define maximum number of words in our vocabulary to 50000
-
-#Define maximum number of words within each complaint document to 250
-
-#Define maximum number of words within each embedding to 100
-
-#Implement Tokenizer object with num_words, filters, lower, split, and char_level
-
-#Fit Tokenizer object on the text
-
-#Get the word index from tokenizer object
-
-#Print number of unique tokens found
-
-#Get a text to sequences representation of the complaints
-
-#Pad the sequences with the max length
-
-#Print the shape of the data
-
-#Print the first example of the tokenizer object to the sequences to text
-
-    
