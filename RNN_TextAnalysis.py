@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import re
 import nltk
+from collections import Counter
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing.text import Tokenizer
 from nltk.tokenize import word_tokenize
@@ -42,18 +43,26 @@ def cleanText(text):
     #Split the text
     text = re.split(r'\W+', text)
     #For each word check if its a word and its an alphanumeric
+    pattern2 = re.compile('[a-zA-Z0-9_]',re.ASCII)
+    text2 = []
+    for t in text:
+        if (re.search(pattern2, t)):
+            text2.append(t)
     #text = re.sub('\w', "", text)
     
     #Remove all english stop words
     stop_words = set(stopwords.words("english"))
-    #text = re.sub(stop_words, "", text)
-    #text = re.sub(stopwords, "", text)
+
     
     #Check if each word in the text and add the ones not in stop words
+    newText = []
+    for t in text2:
+        if t not in stop_words:
+            newText.append(t)
     #Join all the text by " "
-    
+    newText = " ".join(newText)
     #Return the clean text
-    return text
+    return newText
 
 #Apply clean text to the complaints
 newdf0["consumer_complaint_narrative"] = newdf0["consumer_complaint_narrative"].apply(cleanText)
@@ -72,18 +81,26 @@ tf = Tokenizer(num_words = maxWords,
                lower = True,
                split = ' ',
                char_level = True)
-
-#Fit Tokenizer object on the text
+token_counts = Counter()
 newdf0["consumer_complaint_narrative"] = newdf0["consumer_complaint_narrative"].apply(tf.fit_on_texts)
 
+#tf.fit_on_texts(newdf0)
+#Fit Tokenizer object on the text
+"""
+for example in newdf0["consumer_complaint_narrative"]:
+    tokens = tf.tokenize(example[0].numpy()[0])
+    token_counts.update(tokens)
+"""
+#newdf0["consumer_complaint_narrative"] = newdf0["consumer_complaint_narrative"].apply(tf.fit_on_texts)
+
 #Get the word index from tokenizer object
-words = tf.word_index
+#words = tf.word_index
 #Print number of unique tokens found
-print("Number of unique tokens: ", len(set(words)))
+#print("Number of unique tokens: ", len(token_counts))
 #Get a text to sequences representation of the complaints
-sequences = tf.texts_to_sequences(newdf0)
+#sequences = tf.texts_to_sequences(newdf0)
 #Pad the sequences with the max length
-data = pad_sequences(sequences, maxlen = maxCom, padding = 'post')
+#data = pad_sequences(sequences, maxlen = maxCom, padding = 'post')
 #Print the shape of the data
 print(data.shape)
 #Print the first example of the tokenizer object to the sequences to text
