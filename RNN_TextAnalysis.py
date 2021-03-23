@@ -80,33 +80,28 @@ tf = Tokenizer(num_words = maxWords,
                filters = '[,.\"!@#$%^&*(){}?/;`~:<>+=-]',
                lower = True,
                split = ' ',
-               char_level = True)
-token_counts = Counter()
-newdf0["consumer_complaint_narrative"] = newdf0["consumer_complaint_narrative"].apply(tf.fit_on_texts)
+               char_level = False)
 
-#tf.fit_on_texts(newdf0)
+
 #Fit Tokenizer object on the text
-"""
-for example in newdf0["consumer_complaint_narrative"]:
-    tokens = tf.tokenize(example[0].numpy()[0])
-    token_counts.update(tokens)
-"""
-#newdf0["consumer_complaint_narrative"] = newdf0["consumer_complaint_narrative"].apply(tf.fit_on_texts)
+tf.fit_on_texts(newdf0["consumer_complaint_narrative"])
 
 #Get the word index from tokenizer object
-#words = tf.word_index
+word_index = tf.word_index
 #Print number of unique tokens found
-#print("Number of unique tokens: ", len(token_counts))
+print("Number of unique tokens: ", len(tf.word_counts))
 #Get a text to sequences representation of the complaints
-#sequences = tf.texts_to_sequences(newdf0)
+sequences= tf.texts_to_sequences(newdf0["consumer_complaint_narrative"])
 #Pad the sequences with the max length
-#data = pad_sequences(sequences, maxlen = maxCom, padding = 'post')
+data = pad_sequences(sequences, maxlen = maxCom, padding = 'post')
 #Print the shape of the data
 print(data.shape)
 #Print the first example of the tokenizer object to the sequences to text
-
+print("First example: ", word_index)
+#print(tf.word_index[0])
 def main():
-    print(newdf0)
-
+    #print(newdf0)
+    #print(sequences)
+    pass
 if __name__ == "__main__":
     main()
