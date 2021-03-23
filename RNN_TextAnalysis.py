@@ -10,8 +10,8 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 
 #Read in csv file into pandas data frame
-df = pd.read_csv ('consumer_complaints.csv', usecols=['product','consumer_complaint_narrative'])
 #Extract complaints and products into a new dataframe
+df = pd.read_csv ('consumer_complaints.csv', usecols=['product','consumer_complaint_narrative'])
 
 #Check how many values are null and count them
 nullValues = df['consumer_complaint_narrative'].isna().sum()
@@ -24,7 +24,6 @@ print("Number of product values: " + str(productValues))
 #Drop all empty values, reset the index, and drop them
 drop = df.dropna(subset=['consumer_complaint_narrative'])
 newdf0 = drop.reset_index(drop=True, inplace=False)
-#newdf = newdf0.drop(columns=['index'])
 print(newdf0)
 #Recount product values
 productValues = df['consumer_complaint_narrative'].notna().sum()
@@ -35,7 +34,7 @@ def cleanText(text):
     #Lower case the text
     text = text.lower()
     #Compile pattern to remove all other characters
-    pattern = re.compile(r"[,.\"!@#$%^&*(){}?/;`~:<>+=-]")
+    pattern = re.compile(r"[,.\"!@#$%^&*(){}?/;`~:<>+=-_]")
     #Sub the regular expresion with a "" character.
     text = re.sub(pattern, "", text)
     #Remove x from the text characters with a "" character.
@@ -47,13 +46,10 @@ def cleanText(text):
     text2 = []
     for t in text:
         if (re.search(pattern2, t)):
-            text2.append(t)
-    #text = re.sub('\w', "", text)
-    
+            text2.append(t)    
     #Remove all english stop words
     stop_words = set(stopwords.words("english"))
 
-    
     #Check if each word in the text and add the ones not in stop words
     newText = []
     for t in text2:
@@ -77,7 +73,7 @@ maxCom = 250
 maxEmbed = 100
 #Implement Tokenizer object with num_words, filters, lower, split, and char_level
 tf = Tokenizer(num_words = maxWords,
-               filters = '[,.\"!@#$%^&*(){}?/;`~:<>+=-]',
+               filters = '[,.\"!@#$%^&*(){}?/;`~:<>+=-_]',
                lower = True,
                split = ' ',
                char_level = False)
@@ -97,11 +93,5 @@ data = pad_sequences(sequences, maxlen = maxCom, padding = 'post')
 #Print the shape of the data
 print(data.shape)
 #Print the first example of the tokenizer object to the sequences to text
-print("First example: ", word_index)
-#print(tf.word_index[0])
-def main():
-    #print(newdf0)
-    #print(sequences)
-    pass
-if __name__ == "__main__":
-    main()
+print("First example: ", data[0])
+
