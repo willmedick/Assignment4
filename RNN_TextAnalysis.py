@@ -114,35 +114,41 @@ print("First Example: " , tokens[0])
 #print("First example: ", data[0])
 
 #Get dummy representation of complaints into their one hot encoded vector categories
-dummyList = []
-for item in tokens:
-    dummyList.append(tensorflow.keras.preprocessing.text.one_hot(item, maxWords))
-
+#dummyList = []
+#for item in data: #data or tokens?
+#    dummyList.append(tensorflow.keras.preprocessing.text.one_hot(item, maxWords))
+#get dummies - passing product values
+dummies = pd.get_dummies(newdf0["product"])
 #Split data into training and testing data with a test size of 10%
-X_train, X_test, y_train, y_test = train_test_split(dummyList, test_size=0.10)
+X_train, X_test, y_train, y_test = train_test_split(data, dummies, test_size=0.10)
 #Create your RNN model
 model = Sequential()
 #Add your embedding layers
-model.add(Embedding(50,000, 250))
+model.add(Embedding(50,000, input_length=250))
 #Add your spatial dropout (20%)
 model.add(SpatialDropout1D(.20))
-#Add your LSTM layer
+#Add your LSTM layer89=
 model.add(LSTM(100, dropout=.20, recurrent_dropout=.20))
 #Add your dense layer
 model.add(Dense(11, activation='softmax'))
 #Compile your model
-model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=[tf.keras.metrics.Accuracy()])
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=[tensorflow.keras.metrics.Accuracy()])
 #Define epochs
 epochs = 5
 #Define batch size
 batchSize = 64
 #Fit the model with early stop training
-model.fit(X_train, y_train, batch_size=batchSize, epochs=epochs, callbacks=EarlyStopping(monitor='loss', patience=3), min_delta=0.0001)
+fitted = model.fit(X_train, y_train, validation_data = (X_test, y_test), batch_size=batchSize, epochs=epochs, callbacks=[EarlyStopping(monitor='loss',min_delta=0.0001, patience=3)])
 #Evaluate the model for accuracy
-accuracy = tf.keras.metrics.Accuracy.result()
+train_accuracy = model.evaluate(X_train, y_train)
+test_accuracy = model.evaluate(X_test, y_test)
 #Print the accuracy
-print(accuracy)
-#Show graph of loss over time for training data
+print('Training Accuracy: %.3f, Testing Accuracy: %.3f' % (train_accuracy, test_accuracy))
 
+#Show graph of loss over time for training data
+#matplotlib
+plt.plot(fitted.history['loss'], label='Training loss over time')
 #Show graph of accuracy over time for training data
+plt.plot(fitted.history['accuracy'], label='Training accuracy over time')
+#matplotlib
 
