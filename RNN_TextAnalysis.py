@@ -114,17 +114,14 @@ print("First Example: " , tokens[0])
 #print("First example: ", data[0])
 
 #Get dummy representation of complaints into their one hot encoded vector categories
-#dummyList = []
-#for item in data: #data or tokens?
-#    dummyList.append(tensorflow.keras.preprocessing.text.one_hot(item, maxWords))
-#get dummies - passing product values
-dummies = pd.get_dummies(newdf0["product"])
+dummies = pd.get_dummies(newdf0["product"], sparse=True)
+
 #Split data into training and testing data with a test size of 10%
-X_train, X_test, y_train, y_test = train_test_split(data, dummies, test_size=0.10)
+X_train, X_test, y_train, y_test = train_test_split(data, dummies.to_numpy(), test_size=0.10)
 #Create your RNN model
 model = Sequential()
 #Add your embedding layers
-model.add(Embedding(50,000, input_length=250))
+model.add(Embedding(input_dim=50000, output_dim=10000, input_length=250))
 #Add your spatial dropout (20%)
 model.add(SpatialDropout1D(.20))
 #Add your LSTM layer89=
@@ -138,7 +135,8 @@ epochs = 5
 #Define batch size
 batchSize = 64
 #Fit the model with early stop training
-fitted = model.fit(X_train, y_train, validation_data = (X_test, y_test), batch_size=batchSize, epochs=epochs, callbacks=[EarlyStopping(monitor='loss',min_delta=0.0001, patience=3)])
+fitted = model.fit(X_train, y_train, batch_size=batchSize, epochs=epochs, callbacks=[EarlyStopping(monitor='loss',min_delta=0.0001, patience=3)],
+    validation_data=(X_test, y_test))
 #Evaluate the model for accuracy
 train_accuracy = model.evaluate(X_train, y_train)
 test_accuracy = model.evaluate(X_test, y_test)
