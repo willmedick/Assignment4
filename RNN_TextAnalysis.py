@@ -92,7 +92,7 @@ tf = Tokenizer(num_words = maxWords,
                split = ' ',
                char_level = False)
 
-
+tf.num_words =  maxWords
 #Fit Tokenizer object on the text
 tf.fit_on_texts(newdf0["consumer_complaint_narrative"])
 
@@ -121,7 +121,7 @@ X_train, X_test, y_train, y_test = train_test_split(data, dummies.to_numpy(), te
 #Create your RNN model
 model = Sequential()
 #Add your embedding layers
-model.add(Embedding(input_dim=50000, output_dim=10000, input_length=250))
+model.add(Embedding(input_dim=maxWords, output_dim=maxEmbed, input_length=maxCom))
 #Add your spatial dropout (20%)
 model.add(SpatialDropout1D(.20))
 #Add your LSTM layer89=
